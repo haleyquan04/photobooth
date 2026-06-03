@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Webcam Capture</h1>
+    <div id="container">
+        <video autoplay="true" id="videoElement" width="200px" height="auto"></video>
+    </div>
+    <div id="resp">
+
+    </div>
+    <button id="takePictureBtn" onClick="takePicture()">Snap Photo</button>
+
+    <canvas id="canvas" width ="200" height ="auto"></canvas>
+
+    <script>
+        const video = document.querySelector("#videoElement")
+        const canvas = document.getElementById("canvas")
+        const context = canvas.getContext("2d")
+
+        if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                video.srcObject = stream;
+                })
+                .catch(function (err0r) {
+                console.log("Something went wrong!");
+                });
+            }
+
+        var width = video.getHeight()
+
+        function takePicture() {
+            context.drawImage(video, 0, 0, width, width)
+        }
+
+    </script>
+</body>
