@@ -8,16 +8,19 @@
 </head>
 
 <body>
-    <div id="container">
-        <video autoplay="true" id="videoElement" width="200px"></video>
+    <div id="main-container">
+        <div id="timer-display">*</div>
+        <video autoplay="true" id="live-cam"></video>
+        <button id="snap" onClick="goButton()">Snap Photo</button>
     </div>
-    <button id="takePictureBtn" onClick="takePictures()">Snap Photo</button>
-    <button id="save" onClick="saveImage()">Save</button>
 
-    <canvas id="canvas" width ="210" height ="1500"></canvas>
+    <div id="picture-container">
+        <button id="save" onClick="saveImage()">Save</button>
+        <canvas id="canvas" width ="210" height ="1500"></canvas>
+    </div>
 
     <script>
-        const video = document.getElementById("videoElement")
+        const video = document.getElementById("live-cam")
         const canvas = document.getElementById("canvas")
         const context = canvas.getContext("2d")
 
@@ -25,18 +28,34 @@
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(function (stream) {
                 video.srcObject = stream;
-                video.style.filter = "grayscale(100%) contrast(150%) brightness(75%)";
                 })
                 .catch(function (err0r) {
                 console.log("Something went wrong!");
                 });
             }
-
-        function takePictures() {
-            context.drawImage(video, 0, 0, 200, 150)
-            setTimeout(() => {context.drawImage(video, 0, 160, 200, 150);}, 3000);
-            setTimeout(() => {context.drawImage(video, 0, 320, 200, 150);}, 6000);
-            setTimeout(() => {context.drawImage(video, 0, 480, 200, 150);}, 9000);
+        
+        function goButton() {
+            takePicture(0)
+            let i = 1;
+            var picTimer = setInterval(function() {
+                if (i >= 4) {
+                    clearInterval(picTimer);
+                } else
+                    takePicture(i++);
+            }, 5000);
+        }
+        
+        function takePicture(location) {
+            var yCor = location * 160
+            var timeLeft = 3;
+            var snapTimer = setInterval(function() {
+                if (timeLeft <= 0) {
+                    clearInterval(snapTimer);
+                    document.getElementById("timer-display").textContent = "*";
+                    context.drawImage(video, 0, yCor, 200, 150)
+                } else 
+                    document.getElementById("timer-display").textContent = timeLeft--;
+                }, 1000);
         }
 
         function saveImage() {
