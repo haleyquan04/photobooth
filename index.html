@@ -3,24 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
     <link rel="stylesheet" href="styles.css">
+    <title>Document</title>
 </head>
 
 <body>
-    <h1>Webcam Capture</h1>
     <div id="container">
-        <video autoplay="true" id="videoElement" width="200px" height="auto"></video>
+        <video autoplay="true" id="videoElement" width="200px"></video>
     </div>
-    <div id="resp">
+    <button id="takePictureBtn" onClick="takePictures()">Snap Photo</button>
+    <button id="save" onClick="saveImage()">Save</button>
 
-    </div>
-    <button id="takePictureBtn" onClick="takePicture()">Snap Photo</button>
-
-    <canvas id="canvas" width ="200" height ="auto"></canvas>
+    <canvas id="canvas" width ="210" height ="1500"></canvas>
 
     <script>
-        const video = document.querySelector("#videoElement")
+        const video = document.getElementById("videoElement")
         const canvas = document.getElementById("canvas")
         const context = canvas.getContext("2d")
 
@@ -28,16 +25,29 @@
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(function (stream) {
                 video.srcObject = stream;
+                video.style.filter = "grayscale(100%) contrast(150%) brightness(75%)";
                 })
                 .catch(function (err0r) {
                 console.log("Something went wrong!");
                 });
             }
 
-        var width = video.getHeight()
+        function takePictures() {
+            context.drawImage(video, 0, 0, 200, 150)
+            setTimeout(() => {context.drawImage(video, 0, 160, 200, 150);}, 3000);
+            setTimeout(() => {context.drawImage(video, 0, 320, 200, 150);}, 6000);
+            setTimeout(() => {context.drawImage(video, 0, 480, 200, 150);}, 9000);
+        }
 
-        function takePicture() {
-            context.drawImage(video, 0, 0, width, width)
+        function saveImage() {
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob)
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'canvas-image.png';
+                link.click();
+                URL.revokeObjectURL(url);
+            }, 'image/png');
         }
 
     </script>
