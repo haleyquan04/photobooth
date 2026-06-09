@@ -1,3 +1,36 @@
-* {
+#main-container {
+    display: flex;
+    flex: 1;
+}
+
+#camera-container {
+    background-color: aquamarine;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* display: none; */
+}
+
+#picture-container {
+    background-color: lavender;
+    flex-direction: column;
+    display: flex;
+    flex-shrink: 1;
+}
+
+#live-cam {
+    filter: grayscale(100%) contrast(150%) brightness(75%);
+    width: 100px;
+}
+
+#canvas2 {
     border: 2px solid purple;
 }
+
+#canvas {
+    border: 2px solid orange;
+}
+
+/* * {
+    border: 2px solid purple;
+} */

@@ -9,54 +9,96 @@
 
 <body>
     <div id="main-container">
-        <div id="timer-display">*</div>
-        <video autoplay="true" id="live-cam"></video>
-        <button id="snap" onClick="goButton()">Snap Photo</button>
+        <div id="camera-container">
+            <div id="timer-display">*</div>
+            <video autoplay="true" id="live-cam"></video>
+            <button id="snap" onClick="goButton()">Snap Photo</button>
+        </div>
+        <div id="picture-container">
+            <!-- <button id="save" onClick="saveImage()">Save</button> -->
+            <!-- <textarea id="text-input" placeholder="Type a caption here!" maxlength="10"></textarea> -->
+            <canvas id="canvas2" width ="360" height="240"></canvas>
+            <canvas id="canvas" width="440" height="1250"></canvas>
+        </div>
     </div>
-
-    <div id="picture-container">
-        <button id="save" onClick="saveImage()">Save</button>
-        <canvas id="canvas" width ="210" height ="1500"></canvas>
-    </div>
-
+    
     <script>
         const video = document.getElementById("live-cam")
         const canvas = document.getElementById("canvas")
         const context = canvas.getContext("2d")
 
-        if (navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (stream) {
-                video.srcObject = stream;
-                })
-                .catch(function (err0r) {
-                console.log("Something went wrong!");
-                });
-            }
-        
+        let cameraWidth = 320;
+        let cameraHeight = 240;
+        let picturesTaken = 0;
+
+        function loadUp() {
+            if (navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (stream) {
+                    video.srcObject = stream;
+                    })
+                    .catch(function (err0r) {
+                    console.log("Something went wrong!");
+                    });
+                }
+            findCameraDimensions();
+        }
+
         function goButton() {
-            takePicture(0)
-            let i = 1;
-            var picTimer = setInterval(function() {
-                if (i >= 4) {
-                    clearInterval(picTimer);
-                } else
-                    takePicture(i++);
-            }, 5000);
+            takePicture(picturesTaken++);
+            if (picturesTaken >= 4) console.log("completed")
+        }
+
+        function template() {
+            context.beginPath();
+            context.rect(40, 40, 360, 240);
+            context.rect(40, 310, 360, 240);
+            context.rect(40, 580, 360, 240);
+            context.rect(40, 850, 360, 240);
+            context.fill();
+        }
+        function findCameraDimensions() {
+            console.log(video.videoWidth)
+            let ratio = (video.videoWidth / video.videoHeight);
+            console.log(ratio)
+            if (ratio > 1.5) {
+                cameraWidth = 1.5 * video.videoHeight;
+                cameraHeight = video.videoHeight;
+            }
+            else if (ratio < 1.5) {
+                cameraWidth = video.videoWidth;
+                cameraHeight = video.videoWidth / 1.5;
+            }
         }
         
-        function takePicture(location) {
-            var yCor = location * 160
-            var timeLeft = 3;
-            var snapTimer = setInterval(function() {
-                if (timeLeft <= 0) {
-                    clearInterval(snapTimer);
+        function takePicture(picturesTaken) {
+            let yCoor = 40 + picturesTaken * 270;
+            // findCameraDimensions();
+
+            let seconds = 4;
+            const myTimer = setInterval(() => {
+                seconds--;
+                if (seconds > 0) document.getElementById("timer-display").textContent = seconds;
+                else {
+                    clearInterval(myTimer);
                     document.getElementById("timer-display").textContent = "*";
-                    context.drawImage(video, 0, yCor, 200, 150)
-                } else 
-                    document.getElementById("timer-display").textContent = timeLeft--;
-                }, 1000);
+                    console.log(video.videoWidth)
+                    console.log(video.videoHeight)
+                    let canvas2 = document.getElementById("canvas2");
+                    // var canvas2 = document.createElement('canvas');
+                    let con1 = canvas2.getContext("2d");
+                    con1.filter = "grayscale(100%) contrast(150%) brightness(75%)";
+                    con1.drawImage(video, 0, 0, 360, 240);
+                    context.drawImage(canvas2, 40, yCoor, 360, 240)
+                }
+            }, 1000);
         }
+
+        // function savePage() {
+        //     console.log("pagee")
+        //     document.getElementById("main-container").style.display = "none";
+        //     document.getElementById("picture-container").style.display = "flex"
+        // }
 
         function saveImage() {
             canvas.toBlob((blob) => {
@@ -69,5 +111,7 @@
             }, 'image/png');
         }
 
+        loadUp();
+        template();
     </script>
 </body>
