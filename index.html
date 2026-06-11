@@ -3,133 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>Document</title>
+    <link rel="stylesheet" href="styles/index.css">
+    <title>Photobooth</title>
 </head>
 
 <body>
     <div id="main-container">
-        <div id="camera-container">
-            <div id="timer-display">*</div>
-            <video autoplay="true" id="live-cam"></video>
-            <button id="snap" onClick="goButton()">Snap Photo</button>
-            <button id="gray-button" onClick="grayscaleMode()">Gray</button>
-            <button id="color-button" onClick="colorMode()">Color</button>
-        </div>
-        <div id="picture-container">
-            <canvas id="photostrip" width="440" height="1250"></canvas>
-            <button id="save" onClick="saveImage()">Save</button>
-            <textarea id="text-input" placeholder="Type a caption here!" maxlength="10"></textarea>
-        </div>
+        <div id="timer-display">*</div>
+        <video id="live-cam" autoplay="true" ></video>
+        <button id="snap" onClick="takePicture()">Snap Photo</button>
+        <button id="gray-button" onClick="grayscaleMode()">Gray</button>
+        <button id="color-button" onClick="colorMode()">Color</button>
     </div>
-    
-    <script>
-        const video = document.getElementById("live-cam")
-        const canvas = document.getElementById("photostrip")
-        const context = canvas.getContext("2d")
-        const camDimensions = {};
-        let grayscaleOn = false;
-        let picturesTaken = 0;
+    <canvas id="photostrip" width="440" height="1250"></canvas>
+    <canvas id="current-picture" width="360" height="240"></canvas>
 
-        function loadUp() {
-            if (navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function (stream) {
-                    video.srcObject = stream;
-                    })
-                    .catch(function (err0r) {
-                    console.log("Something went wrong!");
-                    });
-                }
-        }
-
-        function goButton() {
-            takePicture(picturesTaken++);
-            if (picturesTaken >= 4) console.log("completed")
-        }
-
-        function template() {
-            context.beginPath();
-            context.rect(40, 40, 360, 240);
-            context.rect(40, 310, 360, 240);
-            context.rect(40, 580, 360, 240);
-            context.rect(40, 850, 360, 240);
-            context.fill();
-        }
-
-        function grayscaleMode() {
-            video.style.filter = "grayscale(100%) contrast(150%) brightness(75%)";
-            grayscaleOn = true;
-        }
-
-        function colorMode() {
-            video.style.filter = "contrast(150%) brightness(75%)";
-            grayscaleOn = false;
-        }
-
-        function findCameraDimensions() {
-            let ratio = (video.videoWidth / video.videoHeight);
-            if (ratio > 1.5) {
-                camDimensions.width = Math.ceil(1.5 * video.videoHeight);
-                camDimensions.height = video.videoHeight;
-                camDimensions.startX = Math.ceil((video.videoWidth - camDimensions.width) / 2);
-                camDimensions.startY = 0;
-            } else if (ratio < 1.5) {
-                camDimensions.width = video.videoWidth;
-                camDimensions.height = Math.ceil(video.videoWidth / 1.5);
-                camDimensions.startX = 0;
-                camDimensions.startY = Math.ceil((video.videoHeight - camDimensions.height) / 2);
-            }
-        }
-        
-        function takePicture(picturesTaken) {
-            let yCoor = 40 + picturesTaken * 270;
-            if (Object.keys(camDimensions).length == 0) findCameraDimensions();
-            let seconds = 4;
-            const myTimer = setInterval(() => {
-                seconds--;
-                if (seconds > 0) document.getElementById("timer-display").textContent = seconds;
-                else {
-                    clearInterval(myTimer);
-                    document.getElementById("timer-display").textContent = "*";
-                    var newPic = document.createElement('canvas');
-                    newPic.width = 360;
-                    newPic.height = 240;
-
-                    let contextPic = newPic.getContext("2d");
-                    if (grayscaleOn) contextPic.filter = "grayscale(100%) contrast(150%) brightness(75%)";
-                    else contextPic.filter = "contrast(150%) brightness(75%)";
-                    contextPic.drawImage(video, camDimensions.startX, camDimensions.startY, camDimensions.width, camDimensions.height, 0, 0, 360, 240);
-                    context.drawImage(newPic, 40, yCoor, 360, 240);
-                }
-            }, 1000);
-        }
-
-        function saveImage() {
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob)
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'canvas-image.png';
-                link.click();
-                URL.revokeObjectURL(url);
-            }, 'image/png');
-        }
-
-        loadUp();
-        template();
-
-
-
-        // function savePage() {
-        //     console.log("pagee")
-        //     document.getElementById("main-container").style.display = "none";
-        //     document.getElementById("picture-container").style.display = "flex"
-        // }
-
-        // taking a picture freezes the webcam for a second
-        // next screen displays canvas
-        // write a message
-        // use promises or something instead of timer stacking
-    </script>
+    <script src="javascripts/main.js"></script>
 </body>
