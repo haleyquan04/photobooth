@@ -8,15 +8,20 @@
 </head>
 
 <body>
-    <div id="main-container">
-        <div id="timer-display">*</div>
-        <video id="live-cam" autoplay="true" ></video>
-        <button id="snap" onClick="takePicture()">Snap Photo</button>
-        <button id="gray-button" onClick="grayscaleMode()">Gray</button>
-        <button id="color-button" onClick="colorMode()">Color</button>
+    <div id="timer-display">*</div>
+    <div id="outer-box">
+        <div id="test-box">
+            <video id="live-cam" autoplay="true" class="grayscale-filter"></video>
+            <canvas id="current-picture" width="360" height="240" class="grayscale-filter"></canvas>
+        </div>
+    </div>
+    <div id="button-container">
+        <button id="snap" onClick="takePicture()">Capture</button>
+        <div id="color-mode">
+            <button id="gray-button" class="selected-button" onClick="grayscaleMode()">Gray</button>
+            <button id="color-button" onClick="colorMode()">Color</button>
+        </div>
     </div>
     <canvas id="photostrip" width="440" height="1250"></canvas>
-    <canvas id="current-picture" width="360" height="240"></canvas>
-
     <script src="javascripts/main.js"></script>
 </body>

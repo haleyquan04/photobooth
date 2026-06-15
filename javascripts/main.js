@@ -4,10 +4,12 @@ const elements = {
     photostripCxt: document.getElementById("photostrip").getContext('2d'),
     picture: document.getElementById("current-picture"),
     pictureCxt: document.getElementById("current-picture").getContext('2d'),
-    timerDisplay: document.getElementById("timer-display")
+    timerDisplay: document.getElementById("timer-display"),
+    displayBox: document.getElementById("test-box"),
+    grayButton: document.getElementById("gray-button"),
+    colorButton: document.getElementById('color-button')
 };
 const cameraDimensions = {};
-let grayscaleOn = false;
 let picturesTaken = 0;
 
 function initializeCamera() {
@@ -50,22 +52,26 @@ function template() {
 }
 
 function grayscaleMode() {
-    const {video} = elements;
-    video.style.filter = "grayscale(100%) contrast(150%) brightness(75%)";
-    grayscaleOn = true;
+    const {video, grayButton, colorButton, picture} = elements;
+    video.classList = "grayscale-filter";
+    picture.classList = "grayscale-filter";
+    grayButton.classList = "selected-button";
+    colorButton.classList = '';
 }
 
 function colorMode() {
-    const {video} = elements;
-    video.style.filter = "contrast(150%) brightness(75%)";
-    grayscaleOn = false;
+    const {video, grayButton, colorButton, picture} = elements;
+    video.classList = "color-filter";
+    picture.classList = "color-filter";
+    grayButton.classList = '';
+    colorButton.classList = "selected-button";
 }
 
 function takePicture() {
-    const {timerDisplay, video, photostripCxt, picture, pictureCxt} = elements;
+    const {timerDisplay, video, photostripCxt, picture, pictureCxt, displayBox} = elements;
 
     let yCoor = picturesTaken * 270 + 40;
-    if (Object.keys(cameraDimensions).length == 0) findCameraDimensions(); // can this be part of initialization stage?
+    if (Object.keys(cameraDimensions).length == 0) findCameraDimensions();
     
     let seconds = 4;
     const timer = setInterval(() => {
@@ -73,24 +79,30 @@ function takePicture() {
         if (seconds > 0) timerDisplay.textContent = seconds;
         else {
             clearInterval(timer);
-            timerDisplay.textContent = '!*!';
-            if (grayscaleOn) pictureCxt.filter = "grayscale(100%) contrast(150%) brightness(75%)";
-            else pictureCxt.filter= "contrast(150%) brightness(75%)";
-
+            timerDisplay.textContent = '*';
             pictureCxt.drawImage(video, cameraDimensions.startX, cameraDimensions.startY, cameraDimensions.width, cameraDimensions.height, 0, 0, 360, 240);
             photostripCxt.drawImage(picture, 40, yCoor, 360, 240);
+            video.style.display = 'none';
+            picture.style.display = 'inline'
+            setTimeout(() => {
+                video.style.display = 'inline';
+                picture.style.display = 'none'
+            }, 1000);
             picturesTaken++;
         }
 
-        if (picturesTaken >= 4) {
-            endPage();
-        }
-    }, 1000);
+        if (picturesTaken >= 1) endPage();
+    }, 500);
 }
 
 function endPage() {
     const {photostrip} = elements;
-    sessionStorage.setItem('finishedPhotostrip', photostrip.toDataURL('image/png'));
+    try {
+        localStorage.setItem('finishedPhotostrip', photostrip.toDataURL('image/png'));
+        console.log(localStorage.getItem('finishedPhotostrip'));
+    } catch (error) {
+        console.log('error?!');
+    }
     setTimeout(() => window.location.href = 'download.html', 500);
 }
 
@@ -98,11 +110,4 @@ initializeCamera();
 template();
 
 // index page:
-// just the camera, the grayscale button, the timer button, and the camera button
 // disable buttons while camera is going
-// image display?
-
-// taking a picture freezes the webcam for a second
-// next screen displays canvas
-// write a message
-// use promises or something instead of timer stacking
