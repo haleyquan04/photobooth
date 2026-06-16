@@ -9,19 +9,24 @@
 
 <body>
     <div id="timer-display">*</div>
-    <div id="outer-box">
-        <div id="test-box">
-            <video id="live-cam" autoplay="true" class="grayscale-filter"></video>
-            <canvas id="current-picture" width="360" height="240" class="grayscale-filter"></canvas>
+    <!-- <div id="first-stage-box"> -->
+        <div id="outer-box">
+            <div id="test-box">
+                <video id="live-cam" autoplay="true" class="grayscale-filter"></video>
+                <canvas id="current-picture" width="360" height="240" class="grayscale-filter"></canvas>
+            </div>
         </div>
-    </div>
-    <div id="button-container">
-        <button id="snap" onClick="takePicture()">Capture</button>
-        <div id="color-mode">
-            <button id="gray-button" class="selected-button" onClick="grayscaleMode()">Gray</button>
-            <button id="color-button" onClick="colorMode()">Color</button>
+        <div id="button-container">
+            <button id="snap" onClick="takePicture()">Capture</button>
+            <div id="color-mode">
+                <button id="gray-button" class="selected-button" onClick="grayscaleMode()">B&W</button>
+                <button id="color-button" onClick="colorMode()">Color</button>
+            </div>
         </div>
+    <!-- </div> -->
+    <div id="second-stage">
+        <canvas id="photostrip" width="440" height="1250"></canvas>
+        <input id="input-box"></input>
     </div>
-    <canvas id="photostrip" width="440" height="1250"></canvas>
-    <script src="javascripts/main.js"></script>
+    <script src="main.js"></script>
 </body>
